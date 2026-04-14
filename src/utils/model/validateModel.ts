@@ -49,6 +49,14 @@ export async function validateModel(
     return { valid: true }
   }
 
+  // Check if it's a known Groq model (skip Anthropic API validation)
+  const { isGroqModel } = await import('../../services/api/groq-fetch-adapter.js')
+  const { isEnvTruthy } = await import('../envUtils.js')
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_GROQ) && isGroqModel(normalizedModel)) {
+    validModelCache.set(normalizedModel, true)
+    return { valid: true }
+  }
+
   // Check if it matches ANTHROPIC_CUSTOM_MODEL_OPTION (pre-validated by the user)
   if (normalizedModel === process.env.ANTHROPIC_CUSTOM_MODEL_OPTION) {
     return { valid: true }

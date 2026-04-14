@@ -36,6 +36,7 @@ import {
   isEnvTruthy,
 } from '../../utils/envUtils.js'
 import { createCodexFetch } from './codex-fetch-adapter.js'
+import { createGroqFetch, isGroqModel, mapClaudeModelToGroq } from './groq-fetch-adapter.js'
 
 /**
  * Environment variables for different client types:
@@ -303,6 +304,21 @@ export async function getAnthropicClient({
     }
     // we have always been lying about the return type - this doesn't support batching or models
     return new AnthropicVertex(vertexArgs) as unknown as Anthropic
+  }
+
+  // ── Groq provider via fetch adapter ────────────────────────────────
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_GROQ)) {
+    const groqKey = process.env.GROQ_API_KEY
+    if (groqKey) {
+      const groqFetch = createGroqFetch(groqKey)
+      const clientConfig: ConstructorParameters<typeof Anthropic>[0] = {
+        apiKey: 'groq-placeholder',
+        ...ARGS,
+        fetch: groqFetch as unknown as typeof globalThis.fetch,
+        ...(isDebugToStdErr() && { logger: createStderrLogger() }),
+      }
+      return new Anthropic(clientConfig)
+    }
   }
 
   // ── Codex (OpenAI) provider via fetch adapter ─────────────────────
