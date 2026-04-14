@@ -3,3 +3,8 @@ dist/
 cli
 cli-dev
 openclaw/
+
+cli.exe
+cli
+cli-dev
+node_modules/
