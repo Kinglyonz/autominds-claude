@@ -1,10 +1,6 @@
 node_modules/
 dist/
-cli
-cli-dev
+/cli
+/cli.exe
+/cli-dev
 openclaw/
-
-cli.exe
-cli
-cli-dev
-node_modules/
